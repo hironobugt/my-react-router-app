@@ -1,9 +1,9 @@
 import { Suspense } from "react";
-import { redirect, useActionData, useNavigation, useSubmit } from "react-router";
+import { useActionData, useNavigation } from "react-router";
 import type { Route } from "./+types/register";
-import { UserForm, ClientOnly } from "~/components/shared";
-import type { UserFormValues } from "~/components/shared";
-import { userService } from "~/services/user.service";
+import { ClientOnly } from "~/components/shared";
+
+export { loader, action } from "./register.server";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -12,45 +12,10 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export async function action({ request }: Route.ActionArgs) {
-  const formData = await request.formData();
-  const username = formData.get("username") as string;
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  // Create user using service (server-side)
-  const result = await userService.createUser({
-    username,
-    email,
-    password,
-  });
-
-  if (!result.success) {
-    return {
-      errors: result.errors || {},
-    };
-  }
-
-  // Redirect to login page on success
-  return redirect("/login");
-}
-
 export default function Register() {
-  const actionData = useActionData<typeof action>();
+  const actionData = useActionData<typeof action>() as any;
   const navigation = useNavigation();
-  const submit = useSubmit();
   const isSubmitting = navigation.state === "submitting";
-
-  const handleSubmit = (values: UserFormValues) => {
-    // Create FormData and submit to server-side action
-    const formData = new FormData();
-    formData.append("username", values.username);
-    formData.append("email", values.email);
-    if (values.password) {
-      formData.append("password", values.password);
-    }
-    submit(formData, { method: "post" });
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -74,12 +39,66 @@ export default function Register() {
           <ClientOnly fallback={<div className="text-center">読み込み中...</div>}>
             {() => (
               <Suspense fallback={<div className="text-center">読み込み中...</div>}>
-                <UserForm
-                  onSubmit={handleSubmit}
-                  submitLabel={isSubmitting ? "登録中..." : "登録"}
-                  errors={actionData?.errors}
-                  initialValues={{ username: "", email: "" }}
-                />
+                <form method="post" className="space-y-4">
+                  <div>
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                      ユーザー名
+                    </label>
+                    <input
+                      id="username"
+                      name="username"
+                      type="text"
+                      required
+                      className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      placeholder="ユーザー名を入力"
+                    />
+                    {actionData?.errors?.username && (
+                      <p className="mt-1 text-sm text-red-600">{actionData.errors.username}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                      メールアドレス
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      placeholder="email@example.com"
+                    />
+                    {actionData?.errors?.email && (
+                      <p className="mt-1 text-sm text-red-600">{actionData.errors.email}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                      パスワード
+                    </label>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      required
+                      className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      placeholder="8文字以上"
+                    />
+                    {actionData?.errors?.password && (
+                      <p className="mt-1 text-sm text-red-600">{actionData.errors.password}</p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? "登録中..." : "登録"}
+                  </button>
+                </form>
               </Suspense>
             )}
           </ClientOnly>

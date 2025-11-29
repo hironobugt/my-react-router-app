@@ -66,6 +66,23 @@ declare module "atomicShared/FormField" {
   export const FormField: React.FC<FormFieldProps>;
 }
 
+declare module "atomicShared/ConfirmDialog" {
+  import React from "react";
+
+  export interface ConfirmDialogProps {
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+    variant?: "danger" | "primary";
+  }
+
+  export const ConfirmDialog: React.FC<ConfirmDialogProps>;
+}
+
 declare module "atomicShared/UserForm" {
   import React from "react";
 

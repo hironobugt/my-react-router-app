@@ -30,6 +30,10 @@ export const RemoteUserCard = lazy(() =>
   loadRemoteModule("./UserCard").then((m) => ({ default: m.UserCard }))
 );
 
+export const RemoteConfirmDialog = lazy(() =>
+  loadRemoteModule("./ConfirmDialog").then((m) => ({ default: m.ConfirmDialog }))
+);
+
 // Re-export types from type definitions
 export type { ButtonProps } from "atomicShared/Button";
 export type { InputProps } from "atomicShared/Input";
@@ -37,3 +41,4 @@ export type { LabelProps } from "atomicShared/Label";
 export type { FormFieldProps } from "atomicShared/FormField";
 export type { UserFormProps } from "atomicShared/UserForm";
 export type { UserCardProps } from "atomicShared/UserCard";
+export type { ConfirmDialogProps } from "atomicShared/ConfirmDialog";

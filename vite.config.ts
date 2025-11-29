@@ -8,4 +8,11 @@ export default defineConfig({
   build: {
     target: "esnext",
   },
+  ssr: {
+    noExternal: ["react-redux", "@reduxjs/toolkit"],
+    external: ["better-sqlite3", "drizzle-orm", "bcrypt"],
+  },
+  optimizeDeps: {
+    exclude: ["better-sqlite3", "drizzle-orm", "bcrypt"],
+  },
 });
