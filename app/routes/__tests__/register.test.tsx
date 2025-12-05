@@ -15,6 +15,15 @@ vi.mock('~/components/shared', () => ({
 // Import action after mocking
 const { action } = await import('../register');
 
+// Helper to call action with proper typing
+const callAction = (request: Request) => {
+  return action({ 
+    request, 
+    params: {}, 
+    context: {} 
+  } as any);
+};
+
 describe('Register Route', () => {
   beforeEach(async () => {
     await clearTestDatabase();
@@ -32,7 +41,7 @@ describe('Register Route', () => {
         body: formData,
       });
 
-      const result = await action({ request, params: {}, context: {} });
+      const result = await callAction(request);
 
       // Should redirect to login
       expect(result).toHaveProperty('status', 302);
@@ -58,10 +67,14 @@ describe('Register Route', () => {
         body: formData,
       });
 
-      const result = await action({ request, params: {}, context: {} });
+      const result = await callAction(request);
 
-      expect(result).toHaveProperty('errors');
-      const data = result as { errors: Record<string, string> };
+      expect(result).toBeInstanceOf(Response);
+      const response = result as Response;
+      expect(response.status).toBe(400);
+      
+      const data = await response.json();
+      expect(data.success).toBe(false);
       expect(data.errors.email).toBeDefined();
       expect(data.errors.email).toContain('有効なメールアドレス');
     });
@@ -77,10 +90,14 @@ describe('Register Route', () => {
         body: formData,
       });
 
-      const result = await action({ request, params: {}, context: {} });
+      const result = await callAction(request);
 
-      expect(result).toHaveProperty('errors');
-      const data = result as { errors: Record<string, string> };
+      expect(result).toBeInstanceOf(Response);
+      const response = result as Response;
+      expect(response.status).toBe(400);
+      
+      const data = await response.json();
+      expect(data.success).toBe(false);
       expect(data.errors.password).toBeDefined();
       expect(data.errors.password).toContain('8文字以上');
     });
@@ -96,10 +113,14 @@ describe('Register Route', () => {
         body: formData,
       });
 
-      const result = await action({ request, params: {}, context: {} });
+      const result = await callAction(request);
 
-      expect(result).toHaveProperty('errors');
-      const data = result as { errors: Record<string, string> };
+      expect(result).toBeInstanceOf(Response);
+      const response = result as Response;
+      expect(response.status).toBe(400);
+      
+      const data = await response.json();
+      expect(data.success).toBe(false);
       expect(data.errors.username).toBeDefined();
       expect(data.errors.username).toContain('3文字以上');
     });
@@ -123,10 +144,14 @@ describe('Register Route', () => {
         body: formData,
       });
 
-      const result = await action({ request, params: {}, context: {} });
+      const result = await callAction(request);
 
-      expect(result).toHaveProperty('errors');
-      const data = result as { errors: Record<string, string> };
+      expect(result).toBeInstanceOf(Response);
+      const response = result as Response;
+      expect(response.status).toBe(400);
+      
+      const data = await response.json();
+      expect(data.success).toBe(false);
       expect(data.errors.email).toBeDefined();
       expect(data.errors.email).toContain('既に使用されています');
     });
